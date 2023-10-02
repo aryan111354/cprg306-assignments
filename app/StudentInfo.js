@@ -9,7 +9,8 @@ const StudentInfo = () => {
       <h4>Course Section: CPRG 306 C</h4>
       <p>
         GitHub Repository: 
-        <Link href="https://github.com/yourusername/your-repo">Visit My GitHub</Link>
+        <Link href="https://github.com/aryan111354/cprg306-assignments">Visit My GitHub</Link>
+        <Link href="/week3">Week 3</Link>
       </p>
     </div>
   );
