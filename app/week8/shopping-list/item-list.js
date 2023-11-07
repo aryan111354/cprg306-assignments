@@ -1,50 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import NewItem from './new-item';
-import ItemList from './item-list';
-import MealIdeas from './meal-ideas';
-import { useUserAuth } from '../_utils/auth-context';
-import itemsData from './items.json';
+"use client"
+import React, { useState } from 'react';
+import Item from './item';
 
-const Page = () => {
-  const [items, setItems] = useState(itemsData);
-  const [selectedItemName, setSelectedItemName] = useState("");
-  const [isLoading, setIsLoading] = useState(true); 
-  const { user } = useUserAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!user) {
-      navigate('/');
-    } else {
-      setIsLoading(false); 
-    }
-  }, [user, navigate]);
-
+const ItemList = ({ items, onItemSelect }) => {
+    const [sortBy, setSortBy] = useState("name");
+    const sortedItems = [...items].sort((a, b) => {
+        if (sortBy === "name") return a.name.localeCompare(b.name);
+        if (sortBy === "category") return a.category.localeCompare(b.category);
+      });
+      
   
-  const handleAddItem = (newItem) => {
-    setItems(currentItems => [...currentItems, newItem]);
+    const sortButtonStyle = {
+      backgroundColor: '#FFA500', // orange
+      border: 'none',
+      color: 'white',
+      padding: '10px 20px',
+      textAlign: 'center',
+      textDecoration: 'none',
+      display: 'inline-block',
+      fontSize: '16px',
+      margin: '4px 2px',
+      cursor: 'pointer',
+      borderRadius: '4px',
+      boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', // subtle shadow for depth
+      transition: 'transform 0.1s' // smooth press effect
   };
-
   
-  const handleItemSelect = (itemName) => {
-    setSelectedItemName(itemName);
+  const activeSortButtonStyle = {
+      ...sortButtonStyle,
+      backgroundColor: '#FF8C00' // darken when selected
   };
-
-  if (isLoading) {
-    return <div>Loading...</div>; 
-  }
 
   return (
-    <main className="bg-black-100 p-4 flex">
-      <div>
-        <h1 className="text-2xl font-bold mb-4 text-indigo-400 flex-auto items-center">Shopping List</h1>
-        <NewItem onAddItem={handleAddItem} />
-        <ItemList items={items} onItemSelect={handleItemSelect} />
-      </div>
-      <MealIdeas ingredient={selectedItemName} />
-    </main>
+<div>
+        <button 
+            style={sortBy === "name" ? activeSortButtonStyle : sortButtonStyle}
+            onClick={() => setSortBy("name")}
+        >
+            Sort by Name
+        </button>
+        <button 
+            style={sortBy === "category" ? activeSortButtonStyle : sortButtonStyle}
+            onClick={() => setSortBy("category")}
+        >
+            Sort by Category
+        </button>
+        
+        <ul>
+        {sortedItems.map(item => (
+                    <Item key={item.id} {...item} onSelect={onItemSelect} />
+                ))}
+        </ul>
+    </div>
+ 
+    
   );
 };
 
-export default Page;
+export default ItemList;

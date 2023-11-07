@@ -1,44 +1,34 @@
-import React, { useCallback } from 'react';
-import { useUserAuth } from './_utils/auth-context';
-import Layout from './layout';
+"use client";
+import React, { useState } from 'react';
+import NewItem from './new-item';
+import ItemList from './item-list';
+import itemsData from './items.json';
+import MealIdeas from './meal-ideas'; 
 
 const Page = () => {
-  const { user, gitHubSignIn, firebaseSignOut } = useUserAuth();
+  const [items, setItems] = useState(itemsData);
+  const [selectedItemName, setSelectedItemName] = useState("");
 
-  const handleSignIn = useCallback(async () => {
-    try {
-      await gitHubSignIn();
-    } catch (error) {
-      console.error("Error signing in with GitHub: ", error);
-      
-    }
-  }, [gitHubSignIn]);
+  const handleAddItem = (item) => {
+    setItems([...items, item]);
+  };
+  const handleItemSelect = (itemName) => {
+    const cleanedItemName = itemName.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|�[�-�]|�[�-�]|[\u2011-\u26FF]|�[�-�])/g, '').split(',')[0].trim();
+    setSelectedItemName(cleanedItemName);
+};
 
-  const handleSignOut = useCallback(async () => {
-    try {
-      await firebaseSignOut();
-    } catch (error) {
-      console.error("Error signing out: ", error);
-  
-    }
-  }, [firebaseSignOut]);
+
 
   return (
-    <Layout>
-      <div>
-        {user ? (
-          <div>
-            <p>Welcome, {user.displayName} ({user.email})</p>
-            <button onClick={handleSignOut}>Logout</button>
-          </div>
-        ) : (
-          <div>
-            {}
-            <button onClick={handleSignIn}>Login with GitHub</button>
-          </div>
-        )}
-      </div>
-    </Layout>
+
+<main className="bg-black-100 p-4 flex">
+<div>
+<h1 className="text-2xl font-bold mb-4 text-indigo-400 flex-auto items-centre">Shopping List</h1>
+      <NewItem onAddItem={handleAddItem} />
+  <ItemList items={items} onItemSelect={handleItemSelect} />
+</div>
+<MealIdeas ingredient={selectedItemName} />
+</main>
   );
 };
 
